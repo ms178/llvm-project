@@ -553,34 +553,34 @@ def : InstRW<[AtomWrite0_1_5], (instregex "ILD_F(16|32|64)")>;
 
 def AtomWrite0_1_7 : SchedWriteRes<[AtomPort0,AtomPort1]> {
   let Latency = 7;
-  let ReleaseAtCycles = [6,6];
+  let ReleaseAtCycles = [6, 6];
 }
-def : InstRW<[AtomWrite0_1_7], (instregex "CVTSI642SDrm(_Int)?")>;
 
 def AtomWrite0_1_7_4 : SchedWriteRes<[AtomPort0,AtomPort1]> {
   let Latency = 7;
-  let ReleaseAtCycles = [8,8];
+  let ReleaseAtCycles = [8, 8];
   let NumMicroOps = 4;
 }
 def : InstRW<[AtomWrite0_1_7_4], (instregex "CVTSI642SSrr(_Int)?")>;
 
 def AtomWrite0_1_8_4 : SchedWriteRes<[AtomPort0,AtomPort1]> {
   let Latency = 8;
-  let ReleaseAtCycles = [8,8];
+  let ReleaseAtCycles = [8, 8];
   let NumMicroOps = 4;
 }
-def : InstRW<[AtomWrite0_1_7_4], (instregex "CVTSI642SSrm(_Int)?")>;
+
+def : InstRW<[AtomWrite0_1_8_4], (instregex "CVTSI642SSrm(_Int)?")>;
 
 def AtomWrite0_1_9 : SchedWriteRes<[AtomPort0,AtomPort1]> {
   let Latency = 9;
-  let ReleaseAtCycles = [9,9];
+  let ReleaseAtCycles = [9, 9];
   let NumMicroOps = 4;
 }
 def : InstRW<[AtomWrite0_1_9], (instregex "CVT(T)?SS2SI64rr(_Int)?")>;
 
 def AtomWrite0_1_10 : SchedWriteRes<[AtomPort0,AtomPort1]> {
   let Latency = 10;
-  let ReleaseAtCycles = [11,11];
+  let ReleaseAtCycles = [11, 11];
   let NumMicroOps = 5;
 }
 def : InstRW<[AtomWrite0_1_10], (instregex "CVT(T)?SS2SI64rm(_Int)?")>;
