@@ -868,7 +868,6 @@ def ProcessorFeatures {
   ];
 
   list<SubtargetFeature> X86_64V4Features = !listconcat(X86_64V3Features, [
-    FeatureAVX512,
     FeatureEVEX512,
     FeatureBWI,
     FeatureCDI,
@@ -1523,7 +1522,7 @@ def ProcessorFeatures {
                                                      FeatureMWAITX];
   list<SubtargetFeature> BdVer4Tuning = BdVer3Tuning;
   list<SubtargetFeature> BdVer4Features =
-    !listconcat(BdVer3Features, BdVer4AdditionalFeatures];
+    !listconcat(BdVer3Features, BdVer4AdditionalFeatures);
 
 
   // AMD Zen Processors common ISAs
