@@ -868,6 +868,7 @@ def ProcessorFeatures {
   ];
 
   list<SubtargetFeature> X86_64V4Features = !listconcat(X86_64V3Features, [
+    FeatureAVX512,
     FeatureEVEX512,
     FeatureBWI,
     FeatureCDI,
@@ -1291,9 +1292,21 @@ def ProcessorFeatures {
   list<SubtargetFeature> ADLAdditionalTuning = [TuningPERMFalseDeps,
                                                 TuningPreferMovmskOverVTest,
                                                 TuningFastImmVectorShift];
-  list<SubtargetFeature> ADLTuning = !listconcat(SKLTuning, ADLAdditionalTuning);
+  // Remove inherited false-dependency tunings that do not apply on Alder/Raptor Lake
+  list<SubtargetFeature> ADLRemoveTuning = [TuningPOPCNTFalseDeps,
+                                            TuningLZCNTFalseDeps];
+  list<SubtargetFeature> ADLTuning =
+    !listremove(!listconcat(SKLTuning, ADLAdditionalTuning), ADLRemoveTuning);
   list<SubtargetFeature> ADLFeatures =
     !listconcat(TRMFeatures, ADLAdditionalFeatures);
+
+  // Raptor Lake (client, no AVX-512): enable fast string ops + prefer 256-bit compute
+  list<SubtargetFeature> RLAdditionalFeatures = [FeatureERMSB, FeatureFSRM];
+  list<SubtargetFeature> RLFeatures =
+    !listconcat(ADLFeatures, RLAdditionalFeatures);
+
+  list<SubtargetFeature> RLAdditionalTuning = [TuningPrefer256Bit];
+  list<SubtargetFeature> RLTuning = !listconcat(ADLTuning, RLAdditionalTuning);
 
   // Gracemont
   list<SubtargetFeature> GRTTuning = [TuningMacroFusion,
@@ -1303,7 +1316,9 @@ def ProcessorFeatures {
                                       TuningFast15ByteNOP,
                                       TuningFastVariablePerLaneShuffle,
                                       TuningPOPCNTFalseDeps,
-                                      TuningInsertVZEROUPPER];
+                                      TuningInsertVZEROUPPER,
+                                      TuningPrefer128Bit,
+                                      TuningNoDomainDelay];
 
   // Arrowlake
   list<SubtargetFeature> ARLAdditionalFeatures = [FeatureCMPCCXADD,
@@ -1508,7 +1523,7 @@ def ProcessorFeatures {
                                                      FeatureMWAITX];
   list<SubtargetFeature> BdVer4Tuning = BdVer3Tuning;
   list<SubtargetFeature> BdVer4Features =
-    !listconcat(BdVer3Features, BdVer4AdditionalFeatures);
+    !listconcat(BdVer3Features, BdVer4AdditionalFeatures];
 
 
   // AMD Zen Processors common ISAs
@@ -1866,7 +1881,7 @@ foreach P = ["sierraforest", "grandridge"] in {
                 ProcessorFeatures.GRTTuning>;
 }
 def : ProcModel<"raptorlake", AlderlakePModel,
-                ProcessorFeatures.ADLFeatures, ProcessorFeatures.ADLTuning>;
+                ProcessorFeatures.RLFeatures, ProcessorFeatures.RLTuning>;
 def : ProcModel<"meteorlake", AlderlakePModel,
                 ProcessorFeatures.ADLFeatures, ProcessorFeatures.ADLTuning>;
 def : ProcModel<"arrowlake", AlderlakePModel,
