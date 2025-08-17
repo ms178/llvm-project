@@ -87,11 +87,10 @@ def ADLPPortAny : ProcResGroup<[ADLPPort00, ADLPPort01, ADLPPort02, ADLPPort03,
 // until 5 cycles after the memory operand.
 def : ReadAdvance<ReadAfterLd, 5>;
 
-// Vector loads are 6 cycles, so ReadAfterVec*Ld registers needn't be available
-// until 6 cycles after the memory operand.
-def : ReadAdvance<ReadAfterVecLd, 6>;
-def : ReadAdvance<ReadAfterVecXLd, 6>;
-def : ReadAdvance<ReadAfterVecYLd, 6>;
+// Dependent-use read-advance after vector loads: 5 cycles
+def : ReadAdvance<ReadAfterVecLd, 5>;
+def : ReadAdvance<ReadAfterVecXLd, 5>;
+def : ReadAdvance<ReadAfterVecYLd, 5>;
 
 def : ReadAdvance<ReadInt2Fpu, 0>;
 
@@ -208,19 +207,19 @@ defm : ADLPWriteResPair<WriteDiv64, [ADLPPort01], 18, [3], 3>;
 defm : X86WriteRes<WriteDiv8, [ADLPPort01], 17, [3], 3>;
 defm : X86WriteRes<WriteDiv8Ld, [ADLPPort01], 22, [3], 3>;
 defm : X86WriteRes<WriteEMMS, [ADLPPort00, ADLPPort00_05, ADLPPort00_06], 10, [1, 8, 1], 10>;
-def : WriteRes<WriteFAdd, [ADLPPort05]> {
+def : WriteRes<WriteFAdd, [ADLPPort00_01]> {
   let Latency = 3;
 }
-defm : X86WriteRes<WriteFAddLd, [ADLPPort01_05, ADLPPort02_03_10], 10, [1, 1], 2>;
-defm : ADLPWriteResPair<WriteFAdd64, [ADLPPort01_05], 3, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFAdd64X, [ADLPPort01_05], 3, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFAdd64Y, [ADLPPort01_05], 3, [1], 1, 8>;
+defm : X86WriteRes<WriteFAddLd, [ADLPPort00_01, ADLPPort02_03_10], 8, [1, 1], 2>;
+defm : ADLPWriteResPair<WriteFAdd64,  [ADLPPort00_01], 3, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFAdd64X, [ADLPPort00_01], 3, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFAdd64Y, [ADLPPort00_01], 3, [1], 1, 5>;
 defm : X86WriteResPairUnsupported<WriteFAdd64Z>;
-defm : ADLPWriteResPair<WriteFAddX, [ADLPPort01_05], 3, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFAddY, [ADLPPort01_05], 3, [1], 1, 8>;
+defm : ADLPWriteResPair<WriteFAddX, [ADLPPort00_01], 3, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFAddY, [ADLPPort00_01], 3, [1], 1, 5>;
 defm : X86WriteResPairUnsupported<WriteFAddZ>;
-defm : ADLPWriteResPair<WriteFBlend, [ADLPPort00_01_05], 1, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFBlendY, [ADLPPort00_01_05], 1, [1], 1, 8>;
+defm : ADLPWriteResPair<WriteFBlend,  [ADLPPort00_01_05], 1, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFBlendY, [ADLPPort00_01_05], 1, [1], 1, 5>;
 def : WriteRes<WriteFCMOV, [ADLPPort01]> {
   let Latency = 3;
 }
@@ -248,21 +247,15 @@ defm : ADLPWriteResPair<WriteFHAddY, [ADLPPort01_05, ADLPPort05], 5, [1, 2], 3, 
 def : WriteRes<WriteFLD0, [ADLPPort00_05]>;
 defm : X86WriteRes<WriteFLD1, [ADLPPort00_05], 1, [2], 2>;
 defm : X86WriteRes<WriteFLDC, [ADLPPort00_05], 1, [2], 2>;
-def : WriteRes<WriteFLoad, [ADLPPort02_03_10]> {
-  let Latency = 7;
-}
-def : WriteRes<WriteFLoadX, [ADLPPort02_03_10]> {
-  let Latency = 7;
-}
-def : WriteRes<WriteFLoadY, [ADLPPort02_03_10]> {
-  let Latency = 8;
-}
-defm : ADLPWriteResPair<WriteFLogic, [ADLPPort00_01_05], 1, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFLogicY, [ADLPPort00_01_05], 1, [1], 1, 8>;
+def : WriteRes<WriteFLoad,  [ADLPPort02_03_10]> { let Latency = 5; }
+def : WriteRes<WriteFLoadX, [ADLPPort02_03_10]> { let Latency = 5; }
+def : WriteRes<WriteFLoadY, [ADLPPort02_03_10]> { let Latency = 5; }
+defm : ADLPWriteResPair<WriteFLogic,  [ADLPPort00_01_05], 1, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFLogicY, [ADLPPort00_01_05], 1, [1], 1, 5>;
 defm : X86WriteResPairUnsupported<WriteFLogicZ>;
-defm : ADLPWriteResPair<WriteFMA, [ADLPPort00_01], 4, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFMAX, [ADLPPort00_01], 4, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFMAY, [ADLPPort00_01], 4, [1], 1, 8>;
+defm : ADLPWriteResPair<WriteFMA,  [ADLPPort00_01], 4, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFMAX, [ADLPPort00_01], 4, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFMAY, [ADLPPort00_01], 4, [1], 1, 5>;
 defm : X86WriteResPairUnsupported<WriteFMAZ>;
 def : WriteRes<WriteFMOVMSK, [ADLPPort00]> {
   let Latency = 3;
@@ -295,9 +288,9 @@ defm : ADLPWriteResPair<WriteFRsqrt, [ADLPPort00], 4, [1], 1, 7>;
 defm : ADLPWriteResPair<WriteFRsqrtX, [ADLPPort00], 4, [1], 1, 7>;
 defm : ADLPWriteResPair<WriteFRsqrtY, [ADLPPort00], 4, [1], 1, 8>;
 defm : X86WriteResPairUnsupported<WriteFRsqrtZ>;
-defm : ADLPWriteResPair<WriteFShuffle, [ADLPPort05], 1, [1], 1, 7>;
-defm : ADLPWriteResPair<WriteFShuffle256, [ADLPPort05], 3, [1], 1, 8>;
-defm : ADLPWriteResPair<WriteFShuffleY, [ADLPPort05], 1, [1], 1, 8>;
+defm : ADLPWriteResPair<WriteFShuffle,    [ADLPPort05], 1, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFShuffle256, [ADLPPort05], 3, [1], 1, 5>;
+defm : ADLPWriteResPair<WriteFShuffleY,   [ADLPPort05], 1, [1], 1, 5>;
 defm : X86WriteResPairUnsupported<WriteFShuffleZ>;
 def : WriteRes<WriteFSign, [ADLPPort00]>;
 defm : ADLPWriteResPair<WriteFSqrt, [ADLPPort00], 12, [1], 1, 7>;
